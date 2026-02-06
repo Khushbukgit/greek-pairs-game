@@ -61,7 +61,8 @@
 <body>
 
 <h1>Greek Alphabet Memory Game</h1>
-<div class="score">Score: <span id="score">100</span></div>
+<div id="score">Score: <span id="scoreValue">100</span></div>
+
 
 <div class="board" id="board"></div>
 
@@ -146,8 +147,15 @@
     document.querySelectorAll(".card").forEach(card => card.onclick = null);
   }
 
+ 
+
+
+
   createBoard();
 </script>
 
 </body>
 </html>
+
+
+
