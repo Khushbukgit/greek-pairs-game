@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Greek Pairs Memory Game</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f2f2f2;
+  }
+
+  h1 {
+    margin-top: 20px;
+  }
+
+  .score {
+    font-size: 20px;
+    margin: 15px 0;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .card {
+    width: 100px;
+    height: 100px;
+    background: #34495e;
+    color: white;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    user-select: none;
+  }
+
+  .card.open {
+    background: #27ae60;
+  }
+
+  .card.matched {
+    background: #95a5a6;
+    cursor: default;
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Greek Alphabet Memory Game</h1>
+<div class="score">Score: <span id="score">100</span></div>
+
+<div class="board" id="board"></div>
+
+<div id="message"></div>
+
+<script>
+  const greekLetters = ["α","β","γ","δ","ε","ζ","η","θ"];
+  let cards = [...greekLetters, ...greekLetters];
+  cards.sort(() => Math.random() - 0.5);
+
+  const board = document.getElementById("board");
+  const scoreEl = document.getElementById("score");
+  const message = document.getElementById("message");
+
+  let score = 100;
+  let firstCard = null;
+  let secondCard = null;
+  let lock = false;
+  let matched = 0;
+
+  function createBoard() {
+    cards.forEach(letter => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.dataset.value = letter;
+      card.textContent = "?";
+
+      card.onclick = () => flip(card);
+      board.appendChild(card);
+    });
+  }
+
+  function flip(card) {
+    if (lock || card.classList.contains("matched") || card === firstCard) return;
+
+    card.textContent = card.dataset.value;
+    card.classList.add("open");
+
+    if (!firstCard) {
+      firstCard = card;
+      return;
+    }
+
+    secondCard = card;
+    lock = true;
+
+    if (firstCard.dataset.value === secondCard.dataset.value) {
+      firstCard.classList.add("matched");
+      secondCard.classList.add("matched");
+      matched++;
+      reset();
+
+      if (matched === greekLetters.length) {
+        message.textContent = "🎉 You won! All cards matched.";
+      }
+    } else {
+      score -= 4;
+      scoreEl.textContent = score;
+
+      setTimeout(() => {
+        firstCard.textContent = "?";
+        secondCard.textContent = "?";
+        firstCard.classList.remove("open");
+        secondCard.classList.remove("open");
+        reset();
+      }, 800);
+
+      if (score <= 0) {
+        message.textContent = "❌ Game Over! Score reached 0.";
+        disableGame();
+      }
+    }
+  }
+
+  function reset() {
+    firstCard = null;
+    secondCard = null;
+    lock = false;
+  }
+
+  function disableGame() {
+    document.querySelectorAll(".card").forEach(card => card.onclick = null);
+  }
+
+  createBoard();
+</script>
+
+</body>
+</html>
